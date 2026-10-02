@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regístrate y Participa</title>
+<meta name="description" content="Regístrate y participa para ganar premios cortesía de nuestros patrocinadores.">
+<style>
+  /* === COLORES: cambia aquí los de tu marca === */
+  :root{
+    --color-fondo:#0d0d12;
+    --color-fondo-2:#1a1a24;
+    --color-primario:#ff5a1f;
+    --color-secundario:#ffc400;
+    --color-texto:#ffffff;
+    --color-texto-suave:#b8b8c6;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--color-texto);
+    background:radial-gradient(circle at 20% 0%,var(--color-fondo-2),var(--color-fondo) 60%);min-height:100vh}
+  .wrap{max-width:560px;margin:0 auto;padding:32px 20px 48px;text-align:center}
+  .logo{width:140px;height:140px;object-fit:contain;margin:0 auto 16px;display:block}
+  .logo-placeholder{width:120px;height:120px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+    font-weight:800;font-size:14px;letter-spacing:.1em;color:#000;
+    background:linear-gradient(135deg,var(--color-primario),var(--color-secundario))}
+  h1{font-size:clamp(28px,7vw,40px);line-height:1.15;margin-bottom:12px}
+  h1 span{background:linear-gradient(90deg,var(--color-primario),var(--color-secundario));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--color-texto-suave);margin-bottom:28px;font-size:18px}
+  form{background:var(--color-fondo-2);border:1px solid #ffffff1a;border-radius:18px;padding:24px;text-align:left;
+    box-shadow:0 10px 40px #0008}
+  label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+  input{width:100%;padding:14px;border-radius:10px;border:1px solid #ffffff26;background:#0d0d12;color:var(--color-texto);font-size:16px}
+  input:focus{outline:2px solid var(--color-secundario);border-color:transparent}
+  button{width:100%;margin-top:22px;padding:16px;border:0;border-radius:12px;font-size:18px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.04em;cursor:pointer;color:#000;
+    background:linear-gradient(90deg,var(--color-primario),var(--color-secundario));transition:transform .15s}
+  button:hover{transform:translateY(-2px)}
+  button:disabled{opacity:.6;cursor:wait}
+  #msg{margin-top:16px;text-align:center;font-weight:600;min-height:24px}
+  .ok{color:#4ade80}.err{color:#f87171}
+  .patro{margin-top:28px;color:var(--color-texto-suave);font-size:14px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <!-- Logo: sube tu archivo a assets/logo.png y reemplaza el bloque de abajo por:
+       <img class="logo" src="assets/logo.png" alt="Logo del evento"> -->
+  <div class="logo-placeholder">TU LOGO</div>
+
+  <h1><span>Regístrate y Participa</span><br>para ganar premios cortesía de nuestros patrocinadores</h1>
+  <p class="sub">Completa tus datos y entra al sorteo.</p>
+
+  <form id="form" novalidate>
+    <label for="nombre">Nombre</label>
+    <input id="nombre" name="nombre" autocomplete="given-name" required>
+    <label for="apellido">Apellido</label>
+    <input id="apellido" name="apellido" autocomplete="family-name" required>
+    <label for="vehiculo">Nombre del vehículo</label>
+    <input id="vehiculo" name="vehiculo" placeholder="Ej: Honda Civic 2018" required>
+    <button type="submit" id="btn">Regístrate ahora</button>
+    <div id="msg" role="status"></div>
+  </form>
+  <p class="patro">Premios cortesía de nuestros patrocinadores</p>
+</main>
+
+<script>
+  // Pega aquí la URL de tu Google Apps Script (ver README.md)
+  const SCRIPT_URL = "PEGA_AQUI_LA_URL_DE_APPS_SCRIPT";
+
+  const form = document.getElementById('form'), msg = document.getElementById('msg'), btn = document.getElementById('btn');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    if (!data.nombre.trim() || !data.apellido.trim() || !data.vehiculo.trim()) {
+      msg.className = 'err'; msg.textContent = 'Por favor completa todos los campos.'; return;
+    }
+    if (SCRIPT_URL.startsWith('PEGA_')) {
+      msg.className = 'err'; msg.textContent = 'Falta configurar la URL del Excel (ver README).'; return;
+    }
+    btn.disabled = true; msg.className = ''; msg.textContent = 'Enviando...';
+    try {
+      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)});
+      msg.className = 'ok'; msg.textContent = '¡Registro exitoso! Ya estás participando 🎉'; form.reset();
+    } catch (err) {
+      msg.className = 'err'; msg.textContent = 'No se pudo enviar. Intenta de nuevo.';
+    }
+    btn.disabled = false;
+  });
+</script>
+</body>
+</html>
