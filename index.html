@@ -80,10 +80,17 @@
     }
     btn.disabled = true; msg.className = ''; msg.textContent = 'Enviando...';
     try {
-      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(data)});
-      msg.className = 'ok'; msg.textContent = '¡Registro exitoso! Ya estás participando 🎉'; form.reset();
+      const r = await fetch(SCRIPT_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(data)});
+      const txt = (await r.text()).trim();
+      if (txt === 'ok') {
+        msg.className = 'ok'; msg.textContent = '¡Registro exitoso! Ya estás participando 🎉'; form.reset();
+      } else {
+        console.error('Respuesta inesperada del script:', txt.slice(0, 300));
+        msg.className = 'err'; msg.textContent = 'No se pudo guardar tu registro. Avisa al organizador.';
+      }
     } catch (err) {
-      msg.className = 'err'; msg.textContent = 'No se pudo enviar. Intenta de nuevo.';
+      console.error(err);
+      msg.className = 'err'; msg.textContent = 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.';
     }
     btn.disabled = false;
   });
